@@ -21,7 +21,6 @@ def read_plate(img_path):
     plt.imshow(gray, cmap='gray')  # Use cmap='gray' for grayscale images
     plt.title('Grayscale Image')
     plt.axis('off')
-    plt.show()
 
     # Apply bilateral filter to reduce noise while preserving edges
     bfilter = cv2.bilateralFilter(gray, 11, 17, 17)  # Parameters: (source, diameter, sigmaColor, sigmaSpace)
@@ -33,7 +32,6 @@ def read_plate(img_path):
     plt.imshow(edged, cmap='gray')  # Use cmap='gray' for binary images
     plt.title('Edge Detection')
     plt.axis('off')
-    plt.show()
 
     # Find contours in the edge-detected image
     keypoints = cv2.findContours(edged.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
@@ -65,7 +63,6 @@ def read_plate(img_path):
     plt.imshow(cv2.cvtColor(new_image, cv2.COLOR_BGR2RGB))
     plt.title('Detected Contour')
     plt.axis('off')
-    plt.show()
 
     (x, y) = np.where(mask == 255)
     (x1, y1) = (np.min(x), np.min(y))
@@ -80,7 +77,6 @@ def read_plate(img_path):
     plt.imshow(cropped_image, cmap='gray')
     plt.title('Cropped Image')
     plt.axis('off')
-    plt.show()
 
     # Encode the saved image to base64
     def encode_image_to_base64(image_path):
@@ -119,7 +115,7 @@ def read_plate(img_path):
         split_text=text.split("\n")
         PLATE_NUMBER=split_text[-1]
         print(f'Plate DETECTED: {PLATE_NUMBER}')
-        return PLATE_NUMBER
+        return PLATE_NUMBER.replace("-",'')
     return ""
 
 read_plate('image4.jpg')
