@@ -2,7 +2,6 @@ opencv-python-headless
 matplotlib
 numpy
 imutils
-pytesseract
 google-cloud-vision
 requests
 python-dotenv
