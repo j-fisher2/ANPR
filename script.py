@@ -7,7 +7,6 @@ import base64
 import re
 from config import VISION_KEY
 
-
 API_ENDPOINT = 'https://vision.googleapis.com/v1/images:annotate?key=' + VISION_KEY
 
 def read_plate(img_path):
