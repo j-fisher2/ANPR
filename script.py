@@ -10,25 +10,20 @@ from config import VISION_KEY
 API_ENDPOINT = 'https://vision.googleapis.com/v1/images:annotate?key=' + VISION_KEY
 
 def read_plate(img_path):
-    # Load the image from file
     img = cv2.imread(img_path)
 
-    # Convert the image to grayscale
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
-    # Display the grayscale image
-    plt.imshow(gray, cmap='gray')  # Use cmap='gray' for grayscale images
+    plt.imshow(gray, cmap='gray') 
     plt.title('Grayscale Image')
     plt.axis('off')
 
     # Apply bilateral filter to reduce noise while preserving edges
     bfilter = cv2.bilateralFilter(gray, 11, 17, 17)  # Parameters: (source, diameter, sigmaColor, sigmaSpace)
 
-    # Perform edge detection using Canny algorithm
     edged = cv2.Canny(bfilter, 30, 200)  # Parameters: (source, threshold1, threshold2)
 
-    # Display the edge-detected image
-    plt.imshow(edged, cmap='gray')  # Use cmap='gray' for binary images
+    plt.imshow(edged, cmap='gray')
     plt.title('Edge Detection')
     plt.axis('off')
 
@@ -36,13 +31,11 @@ def read_plate(img_path):
     keypoints = cv2.findContours(edged.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
     contours = imutils.grab_contours(keypoints)  # Extract contours from keypoints
 
-    # Sort contours by area in descending order and keep the top 10
+    # Sort contours by area in descending orde
     contours = sorted(contours, key=cv2.contourArea, reverse=True)[:10]
 
-    # Initialize variable to store the location of the detected contour
     location = None
 
-    # Iterate through the top contours to find a quadrilateral (4 points)
     for contour in contours:
         # Approximate the contour to a polygon with fewer vertices
         approx = cv2.approxPolyDP(contour, 10, True)  # Parameters: (contour, epsilon, closed)
@@ -52,7 +45,6 @@ def read_plate(img_path):
             location = approx  # Store the contour as the detected location
             break  # Exit the loop once the first quadrilateral is found
 
-    # Print the coordinates of the detected contour
     print(location)
 
     mask = np.zeros(gray.shape, np.uint8)
@@ -68,24 +60,19 @@ def read_plate(img_path):
     (x2, y2) = (np.max(x), np.max(y))
     cropped_image = gray[x1:x2+1, y1:y2+1]
 
-    # Save the cropped image
     cropped_image_path = 'cropped_image.jpg'
     cv2.imwrite(cropped_image_path, cropped_image)
 
-    # Display the final output
     plt.imshow(cropped_image, cmap='gray')
     plt.title('Cropped Image')
     plt.axis('off')
 
-    # Encode the saved image to base64
     def encode_image_to_base64(image_path):
         with open(image_path, "rb") as image_file:
             return base64.b64encode(image_file.read()).decode('utf-8')
 
-    # Use the function to encode your image
     base64_image = encode_image_to_base64(cropped_image_path)
 
-    # Create your request payload
     request_payload = {
         "requests": [
             {
@@ -103,7 +90,6 @@ def read_plate(img_path):
     response = requests.post(API_ENDPOINT, json=request_payload)
     response_data = response.json()
 
-    # Extract and print text from the response
     if 'responses' in response_data and len(response_data['responses']) > 0:
         texts = response_data['responses'][0].get('textAnnotations', [])
         text = texts[0]['description'] if texts else 'No text found'
